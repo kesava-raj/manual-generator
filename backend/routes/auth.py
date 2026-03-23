@@ -1,7 +1,7 @@
 """
 GitHub OAuth routes for AutoManual AI
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 import httpx
@@ -46,14 +46,17 @@ def verify_jwt(token: str) -> dict:
 
 
 @router.get("/github/login")
-async def github_login():
+async def github_login(request: Request):
     """Redirect to GitHub OAuth authorization page"""
+    # Dynamically detect the base URL (works for both localhost and Vercel)
+    base_url = str(request.base_url).rstrip("/")
+    
     scope = "read:user user:email repo"
     url = (
         f"https://github.com/login/oauth/authorize"
         f"?client_id={GITHUB_CLIENT_ID}"
         f"&scope={scope}"
-        f"&redirect_uri={FRONTEND_URL.rstrip('/')}/api/auth/github/callback"
+        f"&redirect_uri={base_url}/api/auth/github/callback"
     )
     return RedirectResponse(url=url)
 

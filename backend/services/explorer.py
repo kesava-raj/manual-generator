@@ -3,7 +3,7 @@ import asyncio
 import json
 import base64
 from datetime import datetime, timezone
-from playwright.async_api import async_playwright
+# from playwright.async_api import async_playwright # Lazy loaded below for Vercel compatibility
 import google.generativeai as genai
 from database import SessionLocal
 from models import Run, Step
@@ -18,6 +18,15 @@ async def explore_website(run_id: str, url: str, username: str, password: str, e
     """
     if not GEMINI_API_KEY:
         emit_event_fn(run_id, "failed", {"error": "GEMINI_API_KEY not configured in environment"})
+        return
+
+    try:
+        from playwright.async_api import async_playwright
+    except ImportError:
+        emit_event_fn(run_id, "failed", {
+            "error": "Real-time exploration (Playwright) is not supported in Vercel's serverless environment. "
+                     "Please use 'Mock Mode' for the online demo, or run AutoManual AI locally to use the full explorer."
+        })
         return
 
     genai.configure(api_key=GEMINI_API_KEY)
