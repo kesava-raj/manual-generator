@@ -17,7 +17,11 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
 JWT_SECRET = os.getenv("JWT_SECRET", "automanual_secret")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# In production, Vercel provides VERCEL_URL if we want to use it
+VERCEL_URL = os.getenv("VERCEL_URL")
+DEFAULT_FRONTEND = f"https://{VERCEL_URL}" if VERCEL_URL else "http://localhost:5173"
+FRONTEND_URL = os.getenv("FRONTEND_URL", DEFAULT_FRONTEND)
 
 
 def create_jwt(user_id: str, username: str) -> str:
