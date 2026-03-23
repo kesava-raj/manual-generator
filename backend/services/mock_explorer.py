@@ -86,7 +86,8 @@ async def run_mock_exploration(db: Session, run_id: str, emit_event):
             "action": new_step.action,
             "description": new_step.description,
             "ai_reasoning": new_step.ai_reasoning,
-            "url": new_step.url
+            "url": new_step.url,
+            "mapped_code": new_step.mapped_code
         })
         
     run.status = "completed"

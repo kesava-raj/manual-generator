@@ -127,7 +127,8 @@ async def explore_website(run_id: str, url: str, username: str, password: str, e
                         "step_number": i, 
                         "action": action_data["action"].capitalize(), 
                         "reasoning": reasoning,
-                        "description": description
+                        "description": description,
+                        "mapped_code": mapped_code
                     })
 
                 except Exception as eval_err:
