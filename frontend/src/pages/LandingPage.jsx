@@ -13,22 +13,22 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-navy overflow-hidden relative">
       {/* Background Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold/5 rounded-full blur-[120px] animate-pulse"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/5 rounded-full blur-[120px] animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
 
       {/* Header */}
       <header className="relative z-10 px-6 py-4 border-b border-white/5 bg-navy/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded bg-gold flex items-center justify-center font-bold text-navy shadow-[0_0_15px_rgba(255,215,0,0.3)] text-sm">A</div>
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(99,102,241,0.3)] text-sm">A</div>
             <div>
               <h1 className="text-white font-bold leading-none text-sm">AutoManual</h1>
-              <span className="text-[8px] text-gold font-medium tracking-widest uppercase">AI Agent</span>
+              <span className="text-[8px] text-indigo-400 font-medium tracking-widest uppercase">AI Agent</span>
             </div>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/dashboard" className="text-white/60 hover:text-white transition-all font-medium text-sm">Login</Link>
-            <a href="/api/auth/github/login" className="gold-button px-4 py-2 text-xs">
+            <a href="/api/auth/github/login" className="btn-brand px-4 py-2 text-xs">
               Connect GitHub
             </a>
           </div>
@@ -38,14 +38,14 @@ const LandingPage = () => {
       {/* Hero Section */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-32">
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-gold/10 border border-gold/20 rounded-full mb-8">
-            <div className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse"></div>
-            <span className="text-[10px] text-gold font-bold uppercase tracking-wider">Powered by Gemini 1.5 Pro</span>
+          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full mb-8">
+            <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></div>
+            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Powered by Gemini 1.5 Pro</span>
           </div>
           
           <h2 className="text-6xl md:text-7xl font-bold text-white mb-8 tracking-tight leading-[1.05]">
             Generate Software Manuals <br />
-            <span className="text-gold shadow-gold-glow italic">Automatically</span>
+            <span className="brand-text brand-glow italic">Automatically</span>
           </h2>
           
           <p className="text-xl text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed">
@@ -56,7 +56,7 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center space-x-0 sm:space-x-6 space-y-4 sm:space-y-0">
             <button 
               onClick={() => navigate('/new-run')}
-              className="gold-button px-10 py-5 text-base w-full sm:w-auto"
+              className="btn-brand px-10 py-5 text-base w-full sm:w-auto"
             >
               Start AI Agent →
             </button>
@@ -91,7 +91,7 @@ const LandingPage = () => {
               icon: "📄" 
             }
           ].map((feature, i) => (
-            <div key={i} className="glass-card p-10 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(255,215,0,0.05)] transition-all duration-500 group">
+            <div key={i} className="glass-card p-10 hover:border-indigo-500/30 hover:shadow-[0_0_30px_rgba(99,102,241,0.05)] transition-all duration-500 group">
               <div className="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300 inline-block">{feature.icon}</div>
               <h3 className="text-white font-bold text-xl mb-4">{feature.title}</h3>
               <p className="text-white/40 leading-relaxed">{feature.desc}</p>
@@ -101,7 +101,7 @@ const LandingPage = () => {
       </main>
 
       {/* Background decoration */}
-      <div className="absolute top-[15%] right-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] pointer-events-none"></div>
+      <div className="absolute top-[15%] right-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[150px] pointer-events-none"></div>
     
       {/* Footer */}
       <footer className="relative z-10 text-center py-8 border-t border-white/5">

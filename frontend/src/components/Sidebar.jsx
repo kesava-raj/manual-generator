@@ -49,13 +49,13 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-navy border-right border-white/5 flex flex-col h-screen fixed">
+    <div className="w-64 bg-[#030712] border-r border-white/5 flex flex-col h-screen fixed">
       <div className="p-6">
         <div className="flex items-center space-x-3 mb-10">
-          <div className="w-8 h-8 rounded bg-gold flex items-center justify-center font-bold text-navy shadow-[0_0_15px_rgba(255,215,0,0.3)]">A</div>
+          <div className="w-8 h-8 rounded bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]">A</div>
           <div>
             <h1 className="text-white font-bold leading-none">AutoManual</h1>
-            <span className="text-[10px] text-gold font-medium tracking-widest uppercase">AI</span>
+            <span className="text-[10px] text-indigo-400 font-medium tracking-widest uppercase">AI</span>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ const Sidebar = () => {
               className={({ isActive }) => `
                 flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
                 ${isActive 
-                  ? 'bg-gold/10 text-gold shadow-[inset_0_0_15px_rgba(255,215,0,0.05)]' 
+                  ? 'bg-indigo-500/10 text-indigo-400 shadow-[inset_0_0_15px_rgba(99,102,241,0.05)]' 
                   : 'text-white/60 hover:text-white hover:bg-white/5'}
               `}
             >
@@ -87,7 +87,7 @@ const Sidebar = () => {
         ) : user ? (
           <div className="space-y-4">
             <div className="flex items-center space-x-3 group cursor-pointer">
-              <img src={user.avatar_url} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 group-hover:border-gold transition-colors" />
+              <img src={user.avatar_url} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 group-hover:border-indigo-500 transition-colors" />
               <div className="overflow-hidden">
                 <p className="text-sm font-medium text-white truncate">{user.username}</p>
                 <p className="text-[10px] text-white/40 truncate">GitHub Connected</p>
@@ -106,7 +106,7 @@ const Sidebar = () => {
         ) : (
           <a 
             href="/api/auth/github/login"
-            className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg bg-white text-navy font-bold hover:bg-gold transition-all duration-300 text-sm"
+            className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg bg-white text-slate-900 font-bold hover:bg-indigo-50 transition-all duration-300 text-sm"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />

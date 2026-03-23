@@ -82,7 +82,7 @@ const ExecutionPage = () => {
   if (!run && !error) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="w-12 h-12 border-4 border-gold/30 border-t-gold rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -109,18 +109,18 @@ const ExecutionPage = () => {
         <div className="absolute inset-0 shimmer pointer-events-none" />
         <div className="flex items-center justify-between mb-4 relative z-10">
           <span className="text-sm font-semibold uppercase tracking-wider text-white/40">Exploration Progress</span>
-          <span className="text-sm font-bold text-gold px-3 py-1 bg-gold/10 rounded-full border border-gold/20">
+          <span className="text-sm font-bold text-indigo-400 px-3 py-1 bg-indigo-500/10 rounded-full border border-indigo-500/20">
             {steps.length} steps captured
           </span>
         </div>
         <div className="h-3 bg-white/5 rounded-full overflow-hidden relative z-10 border border-white/5">
           <div
-            className={`h-full rounded-full transition-all duration-1000 ease-out ${run.status === 'running' ? 'animate-gold-pulse' : ''}`}
+            className={`h-full rounded-full transition-all duration-1000 ease-out ${run.status === 'running' ? 'animate-brand-pulse' : ''}`}
             style={{
               width: `${getProgressPercent()}%`,
               background: run.status === 'failed'
                 ? 'linear-gradient(90deg, #ef4444, #dc2626)'
-                : 'linear-gradient(90deg, #FFD700, #FFA500, #FFD700)',
+                : 'linear-gradient(90deg, #6366f1, #06b6d4, #6366f1)',
               backgroundSize: '200% 100%'
             }}
           />
@@ -153,7 +153,7 @@ const ExecutionPage = () => {
           <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
             {steps.length === 0 ? (
               <div className="flex items-center gap-3 py-4">
-                <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
                 <span className="text-sm text-white/30">Initializing exploration...</span>
               </div>
             ) : (
@@ -166,7 +166,7 @@ const ExecutionPage = () => {
                   {/* Timeline dot */}
                   <div className="flex flex-col items-center">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                      idx === steps.length - 1 ? 'bg-gold text-navy' : 'bg-white/10 text-white/50'
+                      idx === steps.length - 1 ? 'bg-indigo-600 text-white' : 'bg-white/10 text-white/50'
                     }`}>
                       {step.step_number}
                     </div>
@@ -186,7 +186,7 @@ const ExecutionPage = () => {
                     {step.mapped_code && (
                       <div className="mt-4 bg-[#050C1A] rounded-xl border border-white/5 overflow-hidden shadow-inner">
                         <div className="bg-white/5 px-3 py-1.5 border-b border-white/5 flex items-center justify-between">
-                          <span className="text-[9px] text-gold font-bold uppercase tracking-widest">Mapped Source Code</span>
+                          <span className="text-[9px] text-indigo-400 font-bold uppercase tracking-widest">Mapped Source Code</span>
                           <div className="flex gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
                             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
@@ -206,7 +206,7 @@ const ExecutionPage = () => {
             {/* Running indicator */}
             {run.status === 'running' && steps.length > 0 && (
               <div className="flex items-center gap-3 py-2">
-                <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
                 <span className="text-sm text-white/30">Exploring...</span>
               </div>
             )}

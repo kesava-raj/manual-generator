@@ -55,7 +55,7 @@ function ResultsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-10 h-10 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -86,12 +86,12 @@ function ResultsPage() {
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className="btn-gold text-sm flex items-center gap-2"
+            className="btn-brand text-sm flex items-center gap-2"
             id="download-manual-btn"
           >
             {downloading ? (
               <>
-                <div className="w-4 h-4 border-2 border-navy/30 border-t-navy rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Downloading...
               </>
             ) : (
@@ -145,7 +145,7 @@ function ResultsPage() {
               onClick={() => setExpandedStep(expandedStep === step.id ? null : step.id)}
             >
               <div className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center text-navy font-bold text-sm flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg brand-gradient flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {step.step_number}
                 </div>
                 <div>
