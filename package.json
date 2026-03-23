@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "install:all": "cd backend && npm install && cd ../worker && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm install && npm run build",
     "start": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"bgBlue.bold,bgGreen.bold\" \"npm run backend\" \"npm run frontend\"",
     "backend": "cd backend && ..\\venv\\Scripts\\python main.py",
     "frontend": "cd frontend && npm run dev"
