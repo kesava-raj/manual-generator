@@ -27,9 +27,16 @@ def on_startup():
     init_db()
 
 # Mount static files for screenshots and docs
-os.makedirs("storage/screenshots", exist_ok=True)
-os.makedirs("storage/docs", exist_ok=True)
-app.mount("/storage", StaticFiles(directory="storage"), name="storage")
+if os.getenv("VERCEL") != "1":
+    os.makedirs("storage/screenshots", exist_ok=True)
+    os.makedirs("storage/docs", exist_ok=True)
+    app.mount("/storage", StaticFiles(directory="storage"), name="storage")
+else:
+    # On Vercel, serve from /tmp
+    os.makedirs("/tmp/screenshots", exist_ok=True)
+    os.makedirs("/tmp/docs", exist_ok=True)
+    app.mount("/storage/screenshots", StaticFiles(directory="/tmp/screenshots"), name="screenshots")
+    app.mount("/storage/docs", StaticFiles(directory="/tmp/docs"), name="docs")
 
 # Include routers
 app.include_router(auth.router)

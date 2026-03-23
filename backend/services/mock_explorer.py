@@ -58,6 +58,9 @@ async def run_mock_exploration(db: Session, run_id: str, emit_event):
         await emit_event("activity", {"message": f"Mapping UI interaction to repository '{run.github_repo}'..."})
         
         # Create the step in DB
+        base_dir = "/tmp/screenshots" if os.getenv("VERCEL") == "1" else "storage/screenshots"
+        screenshot_path = f"{base_dir}/{run.id}_step_{step_num}.jpg"
+        
         new_step = Step(
             run_id=run.id,
             step_number=step_num,
@@ -65,13 +68,12 @@ async def run_mock_exploration(db: Session, run_id: str, emit_event):
             description=m_step["description"],
             ai_reasoning=m_step["ai_reasoning"],
             url=m_step["url"],
-            # screenshot_path will be fake for now or we can use a generic image
-            screenshot_path=f"storage/screenshots/{run.id}_step_{step_num}.jpg",
+            screenshot_path=screenshot_path,
             mapped_code=f"// Mock Mapped Code for {m_step['keyword']}\nclass {m_step['keyword'].capitalize()}Controller:\n    def handle(self):\n        pass"
         )
         
         # Ensure screenshot dir exists
-        os.makedirs("storage/screenshots", exist_ok=True)
+        os.makedirs(base_dir, exist_ok=True)
         # We don't actually have a screenshot, but we'll fulfill the path
         with open(new_step.screenshot_path, "w") as f:
             f.write("mock screenshot data")

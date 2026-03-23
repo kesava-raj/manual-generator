@@ -158,7 +158,8 @@ async def explore_website(run_id: str, url: str, username: str, password: str, e
             db.close()
 
 async def capture_screenshot(page, run_id, step_num):
-    os.makedirs(f"storage/screenshots/{run_id}", exist_ok=True)
-    path = f"storage/screenshots/{run_id}/step_{step_num:03}.png"
+    base_dir = "/tmp/screenshots" if os.getenv("VERCEL") == "1" else "storage/screenshots"
+    os.makedirs(f"{base_dir}/{run_id}", exist_ok=True)
+    path = f"{base_dir}/{run_id}/step_{step_num:03}.png"
     await page.screenshot(path=path)
     return path

@@ -108,8 +108,9 @@ async def generate_manual(run, steps):
         doc.add_paragraph("\n")
         
     # Output
-    os.makedirs("storage/docs", exist_ok=True)
-    output_path = f"storage/docs/{run.id}.docx"
+    output_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = f"{output_dir}/{run.id}.docx"
     doc.save(output_path)
     return output_path
 
