@@ -55,7 +55,7 @@ function ResultsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -110,8 +110,8 @@ function ResultsPage() {
       <div className="glass-card p-6 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <p className="text-xs text-white/30 uppercase tracking-wider">Status</p>
-          <p className="text-sm font-medium text-emerald-400 mt-1">
-            {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
+          <p className="text-sm font-medium text-red-500 mt-1 uppercase tracking-tighter">
+            PRO - {run.status}
           </p>
         </div>
         <div>

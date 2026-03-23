@@ -105,7 +105,7 @@ function Dashboard() {
       {/* Runs List */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
         </div>
       ) : runs.length === 0 ? (
         <div className="glass-card p-12 text-center">
@@ -131,7 +131,7 @@ function Dashboard() {
                   navigate(`/run/${run.id}`);
                 }
               }}
-              className="glass-card p-5 flex items-center justify-between cursor-pointer group hover:border-indigo-500/20 transition-all duration-300 hover:-translate-y-0.5 animate-slide-up"
+              className="glass-card p-5 flex items-center justify-between cursor-pointer group hover:border-red-500/20 transition-all duration-300 hover:-translate-y-0.5 animate-slide-up"
               style={{ animationDelay: `${idx * 0.05}s` }}
             >
               <div className="flex items-center gap-4">
@@ -139,7 +139,7 @@ function Dashboard() {
                   🌐
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white group-hover:text-indigo-400 transition-colors">
+                  <p className="text-sm font-medium text-white group-hover:text-red-500 transition-colors">
                     {truncateUrl(run.url)}
                   </p>
                   <p className="text-xs text-white/30 mt-1">
@@ -156,7 +156,7 @@ function Dashboard() {
                   {getStatusIcon(run.status)}
                   {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
                 </span>
-                <svg className="w-4 h-4 text-white/20 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-white/20 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>

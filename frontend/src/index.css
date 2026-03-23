@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   * {
@@ -12,8 +12,8 @@
   }
 
   body {
-    font-family: 'Outfit', sans-serif;
-    background-color: #030712; /* Deepest Indigo/Black */
+    font-family: 'Manrope', sans-serif;
+    background-color: #030408; /* Near Black */
     color: #f3f4f6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -33,7 +33,7 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #4f46e5; /* MyProBuddy Indigo */
+    background: #ef3e25; /* MyProBuddy Primary */
   }
 }
 
@@ -48,25 +48,25 @@
   }
 
   .brand-gradient {
-    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    background: linear-gradient(135deg, #ef3e25 0%, #ff8c00 100%);
   }
 
   .brand-text {
-    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    background: linear-gradient(135deg, #ef3e25 0%, #ff8c00 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .btn-brand {
-    @apply px-6 py-3 font-semibold rounded-lg transition-all duration-300 ease-out;
-    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    @apply px-6 py-3 font-bold rounded-lg transition-all duration-300 ease-out uppercase tracking-wider text-sm;
+    background: linear-gradient(135deg, #ef3e25 0%, #ff8c00 100%);
     color: #ffffff;
   }
 
   .btn-brand:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 25px rgba(239, 62, 37, 0.4);
   }
 
   .btn-brand:active {
@@ -74,20 +74,20 @@
   }
 
   .btn-outline {
-    @apply px-6 py-3 font-semibold rounded-lg border border-indigo-500/40 text-indigo-400 transition-all duration-300;
+    @apply px-6 py-3 font-semibold rounded-lg border border-red-500/40 text-red-400 transition-all duration-300;
   }
 
   .btn-outline:hover {
-    @apply bg-indigo-500/10 border-indigo-500;
+    @apply bg-red-500/10 border-red-500;
   }
 
   .input-field {
     @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 
-    focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all duration-300;
+    focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-all duration-300;
   }
 
   .status-running {
-    @apply bg-blue-500/20 text-blue-400 border border-blue-500/30;
+    @apply bg-orange-500/20 text-orange-400 border border-orange-500/30;
   }
 
   .status-completed {
@@ -104,9 +104,9 @@
 
   /* Animations */
   @keyframes brand-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(239, 62, 37, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 62, 37, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 62, 37, 0); }
   }
 
   .animate-brand-pulse {
