@@ -32,7 +32,15 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
     model = genai.GenerativeModel('gemini-1.5-pro')
     
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        # Check for Remote Browser (CDP)
+        ws_endpoint = os.getenv("BROWSER_WS_ENDPOINT")
+        if ws_endpoint:
+            emit_event_fn(run_id, "visual_activity", {"message": "🌐 Connecting to remote cloud browser..."})
+            browser = await p.chromium.connect_over_cdp(ws_endpoint)
+        else:
+            emit_event_fn(run_id, "visual_activity", {"message": "💻 Launching local browser instance..."})
+            browser = await p.chromium.launch(headless=True)
+            
         context = await browser.new_context(viewport={"width": 1280, "height": 800})
         page = await context.new_page()
         
