@@ -48,15 +48,20 @@ def verify_jwt(token: str) -> dict:
 @router.get("/github/login")
 async def github_login(request: Request):
     """Redirect to GitHub OAuth authorization page"""
-    # Dynamically detect the base URL (works for both localhost and Vercel)
-    base_url = str(request.base_url).rstrip("/")
+    # Use FRONTEND_URL to derive the callback if we're behind a proxy, 
+    # but the callback MUST hit the backend.
+    # Standard choice: use the actual backend URL.
+    base_url = os.getenv("BACKEND_URL", str(request.base_url).rstrip("/"))
+    
+    redirect_uri = f"{base_url}/api/auth/github/callback"
+    print(f"[DEBUG] Initiating login with redirect_uri: {redirect_uri}")
     
     scope = "read:user user:email repo"
     url = (
         f"https://github.com/login/oauth/authorize"
         f"?client_id={GITHUB_CLIENT_ID}"
         f"&scope={scope}"
-        f"&redirect_uri={base_url}/api/auth/github/callback"
+        f"&redirect_uri={redirect_uri}"
     )
     return RedirectResponse(url=url)
 
@@ -64,11 +69,13 @@ async def github_login(request: Request):
 @router.get("/github/callback")
 async def github_callback(code: str, db: Session = Depends(get_db)):
     """Handle GitHub OAuth callback"""
+    print(f"[DEBUG] Received callback with code: {code[:5]}...")
     if not code:
         raise HTTPException(status_code=400, detail="No authorization code provided")
 
     # Exchange code for access token
     async with httpx.AsyncClient() as client:
+        print("[DEBUG] Exchanging code for token...")
         token_response = await client.post(
             "https://github.com/login/oauth/access_token",
             json={
@@ -80,10 +87,13 @@ async def github_callback(code: str, db: Session = Depends(get_db)):
         )
 
     token_data = token_response.json()
+    print(f"[DEBUG] GitHub Token Response: {token_data}")
     access_token = token_data.get("access_token")
 
     if not access_token:
-        raise HTTPException(status_code=400, detail="Failed to get access token")
+        error_msg = token_data.get("error_description", "Failed to get access token")
+        print(f"[DEBUG] OAuth Error: {error_msg}")
+        raise HTTPException(status_code=400, detail=error_msg)
 
     # Get user info from GitHub
     async with httpx.AsyncClient() as client:
@@ -96,6 +106,7 @@ async def github_callback(code: str, db: Session = Depends(get_db)):
         )
 
     github_user = user_response.json()
+    print(f"[DEBUG] GitHub User: {github_user.get('login')}")
     github_id = str(github_user.get("id"))
     username = github_user.get("login", "")
     email = github_user.get("email", "") or ""
@@ -122,8 +133,9 @@ async def github_callback(code: str, db: Session = Depends(get_db)):
     db.refresh(user)
 
     # Create JWT
-    token = create_jwt(user.id, user.username)
-
+    token = create_jwt(str(user.id), user.username)
+    
+    print(f"[DEBUG] Login successful for {username}. Redirecting to {FRONTEND_URL}")
     # Redirect to frontend with token
     return RedirectResponse(
         url=f"{FRONTEND_URL}/auth/callback?token={token}"
@@ -131,14 +143,18 @@ async def github_callback(code: str, db: Session = Depends(get_db)):
 
 
 @router.get("/me")
-async def get_current_user(request: Request, db: Session = Depends(get_db)):
-    """Get current user info from JWT token in Authorization header"""
+async def get_current_user(request: Request, token: str = None, db: Session = Depends(get_db)):
+    """Get current user info (supports both Header and Query for transition)"""
     auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
+    token_str = token
+    
+    if auth_header and auth_header.startswith("Bearer "):
+        token_str = auth_header.split(" ")[1]
+        
+    if not token_str:
         raise HTTPException(status_code=401, detail="Missing authorization")
     
-    token = auth_header.split(" ")[1]
-    payload = verify_jwt(token)
+    payload = verify_jwt(token_str)
     user = db.query(User).filter(User.id == payload["sub"]).first()
 
     if not user:

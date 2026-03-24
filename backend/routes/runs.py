@@ -72,8 +72,8 @@ async def run_exploration_v2(run_id: str, url: str, username: str, password: str
     """Background task for v2.0 explorer"""
     from services.explorer_v2 import explore_website_v2
 
-    async def service_emit(et, d):
-        emit_event(run_id, et, d)
+    def service_emit(r_id, et, d):
+        emit_event(r_id, et, d)
             
     try:
         await explore_website_v2(run_id, url, username, password, service_emit, run_mode)

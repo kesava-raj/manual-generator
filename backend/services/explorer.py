@@ -30,7 +30,7 @@ async def explore_website(run_id: str, url: str, username: str, password: str, e
         return
 
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
     
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)

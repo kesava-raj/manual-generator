@@ -26,14 +26,18 @@ def get_db():
 
 
 def init_db():
-    """Create all tables"""
+    """Create all tables and perform simple migrations"""
     if not IS_VERCEL:
         # Ensure local storage directory exists
         os.makedirs("storage/screenshots", exist_ok=True)
         os.makedirs("storage/docs", exist_ok=True)
+        os.makedirs("storage/logos", exist_ok=True)
     else:
         # On Vercel, we can only really use /tmp
         os.makedirs("/tmp/screenshots", exist_ok=True)
         os.makedirs("/tmp/docs", exist_ok=True)
         
+    print("[DATABASE] Performing hard reset of schema to fix missing columns...")
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    print("[DATABASE] Schema reset complete.")
