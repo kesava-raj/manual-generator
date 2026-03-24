@@ -32,7 +32,9 @@ const NewRun = () => {
         setRepos(res.data);
       } catch (err) {
         console.error("Failed to fetch repos", err);
-        setError(`GitHub Error: ${err.response?.data?.detail || err.message}. Try logging out and back in.`);
+        const detail = err.response?.data?.detail;
+        const msg = typeof detail === 'string' ? detail : JSON.stringify(detail);
+        setError(`GitHub Error: ${msg || err.message}. Try logging out and back in.`);
       } finally {
         setReposLoading(false);
       }
