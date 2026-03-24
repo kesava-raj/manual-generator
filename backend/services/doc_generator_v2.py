@@ -12,6 +12,13 @@ from services.repo_analyzer import RepoAnalyzer
 BRAND_RED = (239, 62, 37)
 BRAND_PURPLE = (93, 36, 143)
 
+def resolve_physical_path(logical_path):
+    """Converts 'storage/...' to '/tmp/...' if on Vercel"""
+    if not logical_path: return ""
+    if os.getenv("VERCEL") == "1" and logical_path.startswith("storage/"):
+        return logical_path.replace("storage/", "/tmp/", 1)
+    return logical_path
+
 def set_table_borders(table):
     """Utility to set 1px solid black borders on a table"""
     tbl = table._tbl
@@ -83,9 +90,10 @@ async def generate_generic_user_manual(run, steps):
     doc.add_heading("3. INTERFACE GUIDE", level=1)
     for i, step in enumerate(steps):
         doc.add_heading(f"Module {i+1}: {step.description}", level=2)
-        if step.screenshot_path and os.path.exists(step.screenshot_path):
-            add_red_box_to_image(step.screenshot_path)
-            doc.add_picture(step.screenshot_path, width=Inches(5))
+        p_ss = resolve_physical_path(step.screenshot_path)
+        if p_ss and os.path.exists(p_ss):
+            add_red_box_to_image(p_ss)
+            doc.add_picture(p_ss, width=Inches(5))
             cap = doc.add_paragraph(f"Figure {i+1}.1 - Interface analysis of {step.description}")
             cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
             doc.add_paragraph("\n")
@@ -103,7 +111,7 @@ async def generate_generic_user_manual(run, steps):
         row_cells[0].text = step.action
         row_cells[1].text = step.description
 
-    output_dir = "storage/docs"
+    output_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
     os.makedirs(output_dir, exist_ok=True)
     path = f"{output_dir}/generic_user_{run.id}.docx"
     doc.save(path)
@@ -161,7 +169,9 @@ async def generate_generic_tech_manual(run, steps):
         row[1].text = route["path"]
         row[2].text = route["file"]
 
-    path = f"storage/docs/generic_tech_{run.id}.docx"
+    output_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
+    os.makedirs(output_dir, exist_ok=True)
+    path = f"{output_dir}/generic_tech_{run.id}.docx"
     doc.save(path)
     return path
 
@@ -178,9 +188,10 @@ async def generate_user_manual(run, steps):
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     
     # Title Page
-    if run.logo_path and os.path.exists(run.logo_path):
+    p_logo = resolve_physical_path(run.logo_path)
+    if p_logo and os.path.exists(p_logo):
         try:
-            doc.add_picture(run.logo_path, width=Inches(2))
+            doc.add_picture(p_logo, width=Inches(2))
             last_p = doc.paragraphs[-1]
             last_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         except:
@@ -200,12 +211,13 @@ async def generate_user_manual(run, steps):
         doc.add_heading(f"Step {step.step_number}: {step.description}", level=2)
         doc.add_paragraph(f"Action: {step.action}").italic = True
         
-        if step.screenshot_path and os.path.exists(step.screenshot_path):
+        p_ss = resolve_physical_path(step.screenshot_path)
+        if p_ss and os.path.exists(p_ss):
             # Annotate with red box for visual focus
-            add_red_box_to_image(step.screenshot_path)
+            add_red_box_to_image(p_ss)
             
             # Center picture
-            pic = doc.add_picture(step.screenshot_path, width=Inches(5))
+            pic = doc.add_picture(p_ss, width=Inches(5))
             last_p = doc.paragraphs[-1]
             last_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             
@@ -214,7 +226,7 @@ async def generate_user_manual(run, steps):
             caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
             doc.add_paragraph("\n")
 
-    output_dir = "storage/docs"
+    output_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
     os.makedirs(output_dir, exist_ok=True)
     path = f"{output_dir}/user_manual_{run.id}.docx"
     doc.save(path)
@@ -233,7 +245,7 @@ async def generate_tech_manual(run, steps):
     p.text = "MyProBuddy Manual AI - Technical Specification"
     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
-    title = doc.add_heading("TECHNICAL SPECIFICATION", level=0)
+    title = doc.add_heading("DIGITAL TWIN: TECHNICAL SPECIFICATION", level=0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.add_paragraph(f"System: {run.url}").alignment = WD_ALIGN_PARAGRAPH.CENTER
 
@@ -271,7 +283,7 @@ async def generate_tech_manual(run, steps):
         row[1].text = route["path"]
         row[2].text = route["file"]
 
-    output_dir = "storage/docs"
+    output_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
     os.makedirs(output_dir, exist_ok=True)
     path = f"{output_dir}/tech_manual_{run.id}.docx"
     doc.save(path)

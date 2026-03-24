@@ -40,9 +40,9 @@ async def create_run(
     # Save Logo if provided
     logo_path = None
     if logo:
-        storage_dir = os.path.join("storage", "logos")
-        os.makedirs(storage_dir, exist_ok=True)
-        logo_path = os.path.join(storage_dir, f"{logo.filename}")
+        base_dir = "/tmp/logos" if os.getenv("VERCEL") == "1" else "storage/logos"
+        os.makedirs(base_dir, exist_ok=True)
+        logo_path = os.path.join(base_dir, f"{logo.filename}")
         with open(logo_path, "wb") as buffer:
             shutil.copyfileobj(logo.file, buffer)
 
@@ -120,13 +120,15 @@ async def stream_events(run_id: str):
 @router.get("/{run_id}/download/user")
 async def download_user_manual(run_id: str, mode: str = "branded"):
     filename = f"user_manual_{run_id}.docx" if mode == "branded" else f"generic_user_{run_id}.docx"
-    path = os.path.join("storage", "docs", filename)
+    base_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
+    path = os.path.join(base_dir, filename)
     if not os.path.exists(path): raise HTTPException(status_code=404, detail=f"User manual ({mode}) not ready")
     return FileResponse(path, filename=f"{mode}_user_manual_{run_id[:8]}.docx")
 
 @router.get("/{run_id}/download/tech")
 async def download_tech_manual(run_id: str, mode: str = "branded"):
     filename = f"tech_manual_{run_id}.docx" if mode == "branded" else f"generic_tech_{run_id}.docx"
-    path = os.path.join("storage", "docs", filename)
+    base_dir = "/tmp/docs" if os.getenv("VERCEL") == "1" else "storage/docs"
+    path = os.path.join(base_dir, filename)
     if not os.path.exists(path): raise HTTPException(status_code=404, detail=f"Technical manual ({mode}) not ready")
     return FileResponse(path, filename=f"{mode}_tech_manual_{run_id[:8]}.docx")

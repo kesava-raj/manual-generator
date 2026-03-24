@@ -12,8 +12,8 @@
       "destination": "api/index.py"
     },
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "source": "/((?!api/|storage/).*)",
+      "destination": "/index.html"
     }
   ],
   "env": {

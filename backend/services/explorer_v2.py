@@ -79,9 +79,37 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
                 except:
                     emit_event_fn(run_id, "visual_activity", {"message": "⚠️ Interaction failed during login, proceeding..."})
 
-            # --- PHASE 2: RECURSIVE DISCOVERY ---
+            # --- PHASE 2: APPLICATION MAPPING (DEEP SCAN) ---
+            emit_event_fn(run_id, "visual_activity", {"message": "🗺️ Mapping application structure..."})
+            
+            initial_screenshot = await capture_screenshot(page, run_id, "map_initial")
+            with open(initial_screenshot, "rb") as f:
+                map_img = f.read()
+            
+            map_prompt = """
+            Analyze this screenshot of the application's main interface.
+            1. Identify ALL primary navigation tabs.
+            2. Identify ALL sub-menus or significant side-bar items.
+            3. Identify primary Call-To-Action (CTA) buttons.
+            
+            Return the result ONLY as a JSON list of strings representing the text of these items.
+            Example: ["Dashboard", "User Management", "Billings", "API Settings"]
+            """
+            map_res = await asyncio.to_thread(model.generate_content, [map_prompt, {"mime_type": "image/png", "data": map_img}])
+            try:
+                menu_items = json.loads(map_res.text.replace('```json', '').replace('```', '').strip())
+                emit_event_fn(run_id, "visual_activity", {"message": f"📍 Discovery complete: Found {len(menu_items)} primary modules."})
+            except:
+                menu_items = []
+                emit_event_fn(run_id, "visual_activity", {"message": "⚠️ mapping failed, using dynamic discovery."})
+
+            # --- PHASE 3: RECURSIVE DISCOVERY ---
+            # We combine the map with dynamic reasoning
             max_steps = 15
             visited_urls = {page.url}
+            
+            # Convert menu items to a queue for the agent to consider
+            menu_queue = menu_items.copy() if menu_items else []
             
             for i in range(1, max_steps + 1):
                 emit_event_fn(run_id, "visual_activity", {"message": f"👁️ Scanning UI state {i}..."})
@@ -90,24 +118,30 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
                 with open(screenshot_path, "rb") as f:
                     image_data = f.read()
                 
-                # Fetch minimal DOM for Technical Agent
-                dom_summary = await page.evaluate("() => document.body.innerText.substring(0, 1000)")
+                # NEW: Fetch Accessibility Tree for better precision
+                accessibility_snapshot = await page.accessibility.snapshot()
+                acc_tree_json = json.dumps(accessibility_snapshot, indent=2)[:2000] # Cap for context
 
-                discovery_prompt = """
-                You are MyProBuddy v2.0 Agent. 
-                1. ANALYZE the UI: Identify all tabs, primary buttons, and hidden sub-menus.
-                2. DECIDE: Which element should we document next to provide a complete guide?
-                3. TECHNICAL: What is the 'Button Responsibility' (business logic) of the target?
+                discovery_prompt = f"""
+                You are MyProBuddy v2.2 Deep Scan Agent. 
+                
+                CONTEXT:
+                - Target Mapping Queue: {menu_queue}
+                - Accessibility Tree (Partial): {acc_tree_json}
+                
+                GOALS:
+                1. DOCUMENT the current view.
+                2. DECIDE: Based on the Map and the UI, where should we click next?
+                3. TECHNICAL: Define 'Button Responsibility' (business logic).
                 
                 Output JSON:
-                {
+                {{
                     "visual_action": "click | type | scroll | finish",
-                    "target_selector": "CSS Selector",
-                    "description": "User-friendly description (e.g. Navigating to Billing Tab)",
-                    "responsibility": "Technical logic (e.g. Triggers the subscription middleware)",
-                    "is_new_module": true/false,
-                    "reasoning": "Why this step is critical for the manual"
-                }
+                    "target_selector": "CSS Selector or text='Text'",
+                    "description": "User-friendly description",
+                    "responsibility": "Technical logic description for mapping to code",
+                    "reasoning": "Strategy explanation"
+                }}
                 """
 
                 response = await asyncio.to_thread(model.generate_content, [discovery_prompt, {"mime_type": "image/png", "data": image_data}])
@@ -115,22 +149,31 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
                 try:
                     data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
                     
-                    if data["visual_action"] == "finish":
-                        emit_event_fn(run_id, "visual_activity", {"message": "🏁 Exploration goals met."})
+                    if data["visual_action"] == "finish" and not menu_queue:
+                        emit_event_fn(run_id, "visual_activity", {"message": "🏁 Full Application Digital Twin complete."})
                         break
+
+                    # Update logic if we clicked a mapped item
+                    for item in menu_queue[:]:
+                        if item.lower() in data['description'].lower():
+                            menu_queue.remove(item)
 
                     # Dual-Track Logging
                     emit_event_fn(run_id, "visual_activity", {"message": f"👉 Action: {data['description']}"})
                     emit_event_fn(run_id, "tech_activity", {"message": f"⚙️ Logic: {data['responsibility']}"})
                     
                     # Execute Action
-                    await page.click(data["target_selector"], timeout=8000)
-                    await asyncio.sleep(2)
+                    try:
+                        await page.click(data["target_selector"], timeout=8000)
+                        await page.wait_for_load_state("networkidle")
+                        await asyncio.sleep(2)
+                    except:
+                        emit_event_fn(run_id, "visual_activity", {"message": f"⚠️ Could not click {data['target_selector']}, trying next..."})
 
                     # Technical Mapping (GitHub Integration)
                     mapped_code = None
                     if run.github_repo:
-                        emit_event_fn(run_id, "tech_activity", {"message": f"🔍 Mapping code for '{data['target_selector']}' in {run.github_repo}"})
+                        emit_event_fn(run_id, "tech_activity", {"message": f"🔍 Mapping code for '{data['target_selector']}'"})
                         github_token = os.getenv("GITHUB_TOKEN") 
                         if github_token:
                             search_query = f"{data['description']} {data['responsibility']}"
@@ -185,8 +228,14 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
             db.close()
 
 async def capture_screenshot(page, run_id, step_id):
-    base_dir = "/tmp/screenshots" if os.getenv("VERCEL") == "1" else "storage/screenshots"
-    os.makedirs(f"{base_dir}/{run_id}", exist_ok=True)
-    path = f"{base_dir}/{run_id}/v2_step_{step_id}.png"
-    await page.screenshot(path=path)
-    return path
+    physical_base = "/tmp/screenshots" if os.getenv("VERCEL") == "1" else "storage/screenshots"
+    logical_base = "storage/screenshots"
+    
+    os.makedirs(f"{physical_base}/{run_id}", exist_ok=True)
+    
+    filename = f"v2_step_{step_id}.png"
+    physical_path = f"{physical_base}/{run_id}/{filename}"
+    logical_path = f"{logical_base}/{run_id}/{filename}"
+    
+    await page.screenshot(path=physical_path)
+    return logical_path
