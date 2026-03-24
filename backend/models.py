@@ -38,6 +38,7 @@ class Run(Base):
     total_steps = Column(Integer, default=0)
     github_repo = Column(String, default="")  # linked repo (owner/name)
     logo_path = Column(String, nullable=True)
+    mode = Column(String, default="dual")  # user, tech, dual
     created_at = Column(DateTime, default=utcnow)
     completed_at = Column(DateTime, nullable=True)
 

@@ -10,7 +10,7 @@ from services import github_service
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-async def explore_website_v2(run_id: str, url: str, username: str, password: str, emit_event_fn):
+async def explore_website_v2(run_id: str, url: str, username: str, password: str, emit_event_fn, run_mode: str = "dual"):
     """
     v2.0 Autonomous exploration loop:
     - Authenticated login 
@@ -124,14 +124,15 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
 
                 discovery_prompt = f"""
                 You are MyProBuddy v2.2 Deep Scan Agent. 
+                MODE: {run_mode}
                 
                 CONTEXT:
                 - Target Mapping Queue: {menu_queue}
                 - Accessibility Tree (Partial): {acc_tree_json}
                 
                 GOALS:
-                1. DOCUMENT the current view.
-                2. DECIDE: Based on the Map and the UI, where should we click next?
+                1. DOCUMENT the current view focusing on {'User Experience and Visual Flow' if run_mode == 'user' else 'Technical Architecture and Logic Mapping'}.
+                2. DECIDE: Based on the Map and the UI, where should we click next to complete the {run_mode} guide?
                 3. TECHNICAL: Define 'Button Responsibility' (business logic).
                 
                 Output JSON:
@@ -150,7 +151,7 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
                     data = json.loads(response.text.replace('```json', '').replace('```', '').strip())
                     
                     if data["visual_action"] == "finish" and not menu_queue:
-                        emit_event_fn(run_id, "visual_activity", {"message": "🏁 Full Application Digital Twin complete."})
+                        emit_event_fn(run_id, "visual_activity", {"message": f"🏁 {run_mode.capitalize()} Analysis Complete."})
                         break
 
                     # Update logic if we clicked a mapped item
@@ -160,7 +161,8 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
 
                     # Dual-Track Logging
                     emit_event_fn(run_id, "visual_activity", {"message": f"👉 Action: {data['description']}"})
-                    emit_event_fn(run_id, "tech_activity", {"message": f"⚙️ Logic: {data['responsibility']}"})
+                    if run_mode != "user":
+                        emit_event_fn(run_id, "tech_activity", {"message": f"⚙️ Logic: {data['responsibility']}"})
                     
                     # Execute Action
                     try:
@@ -172,7 +174,7 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
 
                     # Technical Mapping (GitHub Integration)
                     mapped_code = None
-                    if run.github_repo:
+                    if run_mode != "user" and run.github_repo:
                         emit_event_fn(run_id, "tech_activity", {"message": f"🔍 Mapping code for '{data['target_selector']}'"})
                         github_token = os.getenv("GITHUB_TOKEN") 
                         if github_token:
@@ -211,12 +213,14 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
             run.status = "completed"
             run.completed_at = datetime.now(timezone.utc)
             db.commit()
-            emit_event_fn(run_id, "completed", {"message": "v2.0 Documentation compiled successfully"})
+            emit_event_fn(run_id, "completed", {"message": f"v2.2 {run_mode.capitalize()} Analysis compiled successfully"})
             
-            # Trigger Dual-Manual Generation
+            # Trigger Manual Generation based on mode
             from services.doc_generator_v2 import generate_dual_manuals
             steps = db.query(Step).filter(Step.run_id == run_id).order_by(Step.step_number).all()
-            await generate_dual_manuals(run, steps, mode="all")
+            # If dual, we generate all; if user/tech, we generate specific ones
+            gen_mode = "all" if run_mode == "dual" else ("branded" if run_mode == "user" else "generic")
+            await generate_dual_manuals(run, steps, mode=gen_mode)
 
         except Exception as e:
             if run:

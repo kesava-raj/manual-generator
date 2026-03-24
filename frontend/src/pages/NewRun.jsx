@@ -26,7 +26,9 @@ const NewRun = () => {
       }
 
       try {
-        const res = await axios.get(`/api/github/repos?token=${token}`);
+        const res = await axios.get('/api/github/repos', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         setRepos(res.data);
       } catch (err) {
         console.error("Failed to fetch repos", err);
@@ -54,8 +56,7 @@ const NewRun = () => {
     window.location.href = '/api/auth/github/login';
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (mode = "dual") => {
     setLoading(true);
     setError('');
 
@@ -71,6 +72,7 @@ const NewRun = () => {
     formData.append('username', username.trim());
     formData.append('password', password);
     formData.append('github_repo', selectedRepo);
+    formData.append('run_mode', mode);
     if (logo) {
       formData.append('logo', logo);
     }
@@ -229,23 +231,25 @@ const NewRun = () => {
               <p className="text-[10px] text-white/20 mt-4 text-center">Used for "User Manual" branding</p>
             </div>
 
-            <div className="space-y-4 pt-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <div className="space-y-3 pt-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <button
-                type="submit"
-                disabled={loading}
+                type="button"
+                onClick={() => handleSubmit("user")}
+                disabled={loading || !url}
                 className="w-full btn-brand py-5 text-base flex flex-col items-center justify-center gap-1 active:scale-[0.98]"
               >
-                {loading ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Initing v2.0 Agent...</span>
-                  </div>
-                ) : (
-                  <>
-                    <span className="text-lg">Generate Dual Manuals</span>
-                    <span className="text-[10px] opacity-60 font-normal">Visual Agent + Technical Agent</span>
-                  </>
-                )}
+                <span className="text-lg">{loading ? "INITING..." : "BUILD USER MANUAL"}</span>
+                <span className="text-[10px] opacity-60 font-normal uppercase">Visual Agent • Branded Docs</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSubmit("tech")}
+                disabled={loading || !url || !selectedRepo}
+                className="w-full btn-purple py-5 text-base flex flex-col items-center justify-center gap-1 active:scale-[0.98]"
+              >
+                <span className="text-lg">{loading ? "INITING..." : "MAP TECH ARCH"}</span>
+                <span className="text-[10px] opacity-60 font-normal uppercase">Technical Agent • Code Logic</span>
               </button>
               
               <div className="p-4 bg-white/5 rounded-xl border border-white/5 backdrop-blur-sm">

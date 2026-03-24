@@ -32,6 +32,7 @@ async def create_run(
     username: Optional[str] = Form(""),
     password: Optional[str] = Form(""),
     github_repo: Optional[str] = Form(""),
+    run_mode: str = Form("dual"),
     logo: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
@@ -52,6 +53,7 @@ async def create_run(
         status="running",
         github_repo=github_repo,
         logo_path=logo_path,
+        mode=run_mode
     )
     db.add(run)
     db.commit()
@@ -61,12 +63,12 @@ async def create_run(
 
     # Start v2.0 Exploration
     background_tasks.add_task(
-        run_exploration_v2, run.id, url, username, password
+        run_exploration_v2, run.id, url, username, password, run_mode
     )
 
     return {"id": run.id, "url": url, "status": "running"}
 
-async def run_exploration_v2(run_id: str, url: str, username: str, password: str):
+async def run_exploration_v2(run_id: str, url: str, username: str, password: str, run_mode: str = "dual"):
     """Background task for v2.0 explorer"""
     from services.explorer_v2 import explore_website_v2
 
@@ -74,7 +76,7 @@ async def run_exploration_v2(run_id: str, url: str, username: str, password: str
         emit_event(run_id, et, d)
             
     try:
-        await explore_website_v2(run_id, url, username, password, service_emit)
+        await explore_website_v2(run_id, url, username, password, service_emit, run_mode)
     except Exception as e:
         print(f"[API] v2.0 Exploration failed: {e}")
         db = SessionLocal()

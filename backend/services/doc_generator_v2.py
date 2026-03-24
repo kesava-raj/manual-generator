@@ -47,20 +47,21 @@ def add_red_box_to_image(image_path, box=None):
     except Exception as e:
         print(f"Failed to annotate image: {e}")
 
-async def generate_dual_manuals(run, steps, mode="branded"):
-    """Entry point with mode selection"""
+async def generate_dual_manuals(run, steps, mode="all"):
+    """Entry point with mode selection: 'user', 'tech', or 'all'"""
     if mode == "all":
-        # Generate both for maximum availability
         await generate_generic_user_manual(run, steps)
         await generate_generic_tech_manual(run, steps)
         await generate_user_manual(run, steps)
         await generate_tech_manual(run, steps)
-    elif mode == "generic":
-        user_path = await generate_generic_user_manual(run, steps)
-        tech_path = await generate_generic_tech_manual(run, steps)
-    else:
-        user_path = await generate_user_manual(run, steps)
-        tech_path = await generate_tech_manual(run, steps)
+    elif mode == "user":
+        # Only User Centric
+        await generate_generic_user_manual(run, steps)
+        await generate_user_manual(run, steps)
+    elif mode == "tech":
+        # Only Tech Centric
+        await generate_generic_tech_manual(run, steps)
+        await generate_tech_manual(run, steps)
     return True
 
 async def generate_generic_user_manual(run, steps):
