@@ -32,6 +32,7 @@ const NewRun = () => {
         setRepos(res.data);
       } catch (err) {
         console.error("Failed to fetch repos", err);
+        setError(`GitHub Error: ${err.response?.data?.detail || err.message}. Try logging out and back in.`);
       } finally {
         setReposLoading(false);
       }
@@ -108,6 +109,11 @@ const NewRun = () => {
           <p className="text-lg text-white/40 font-medium accent-text tracking-wide">
             The Autonomous Documentation Agent for Modern SaaS
           </p>
+          {error && (
+            <div className="mt-8 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm animate-shake">
+              ⚠️ {error}
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">

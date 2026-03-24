@@ -23,13 +23,20 @@ async def list_repos(request: Request, db: Session = Depends(get_db)):
         # 1. Verify our App's JWT
         payload = verify_jwt(token_str)
         user_id = payload.get("sub")
+        print(f"[DEBUG] Fetching repos for user_id: {user_id}")
         
         # 2. Get real GitHub token from DB
         user = db.query(User).filter(User.id == user_id).first()
-        if not user or not user.access_token:
+        if not user:
+            print(f"[DEBUG] No user found in DB for ID: {user_id}")
+            raise HTTPException(status_code=401, detail="User not found in database")
+            
+        if not user.access_token:
+            print(f"[DEBUG] User {user_id} found, but access_token is MISSING")
             raise HTTPException(status_code=401, detail="GitHub not connected for this user")
         
         gh_token = user.access_token
+        print(f"[DEBUG] Using GitHub token (last 4): ...{gh_token[-4:] if gh_token else 'NONE'}")
         
         # 3. Call GitHub
         async with httpx.AsyncClient() as client:
@@ -42,10 +49,13 @@ async def list_repos(request: Request, db: Session = Depends(get_db)):
                 },
             )
 
+        print(f"[DEBUG] GitHub API Response Status: {response.status_code}")
         if response.status_code != 200:
+            print(f"[DEBUG] GitHub API Error Body: {response.text}")
             raise HTTPException(status_code=response.status_code, detail="Failed to fetch repos from GitHub")
 
         repos = response.json()
+        print(f"[DEBUG] Successfully found {len(repos)} repositories.")
         return [
             {
                 "full_name": r["full_name"],
@@ -59,7 +69,11 @@ async def list_repos(request: Request, db: Session = Depends(get_db)):
             for r in repos
         ]
     except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        print(f"[DEBUG] ERROR in list_repos: {str(e)}")
+        # Return the error as a 401 but with the message inside so the frontend can show it
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=401, detail=f"Backend Error: {str(e)}")
 
 
 @router.get("/tree")
