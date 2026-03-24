@@ -167,23 +167,112 @@ async def generate_generic_tech_manual(run, steps):
 
 # --- PREVIOUS BRANDED GENERATORS ---
 async def generate_user_manual(run, steps):
+    """Visual-heavy, step-by-step branded user guide"""
     doc = Document()
-    doc.add_heading("USER MANUAL (MyProBuddy Branded)", level=1)
-    for step in steps:
-        doc.add_paragraph(f"Step {step.step_number}: {step.description}")
+    
+    # Header with Branding
+    section = doc.sections[0]
+    header = section.header
+    p = header.paragraphs[0]
+    p.text = "MyProBuddy Manual AI - Official User Guide"
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    
+    # Title Page
+    if run.logo_path and os.path.exists(run.logo_path):
+        try:
+            doc.add_picture(run.logo_path, width=Inches(2))
+            last_p = doc.paragraphs[-1]
+            last_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        except:
+            pass
+
+    title = doc.add_heading("USER MANUAL", level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(f"Target System: {run.url}").alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(f"Generated on {datetime.now().strftime('%B %d, %Y')}").alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_page_break()
+
+    doc.add_heading("1. INTRODUCTION", level=1)
+    doc.add_paragraph("This manual provides a visual, step-by-step guide to the core user journeys of your application, autonomously mapped by MyProBuddy Manual AI.")
+
+    doc.add_heading("2. CORE USER JOURNEYS", level=1)
+    for i, step in enumerate(steps):
+        doc.add_heading(f"Step {step.step_number}: {step.description}", level=2)
+        doc.add_paragraph(f"Action: {step.action}").italic = True
+        
         if step.screenshot_path and os.path.exists(step.screenshot_path):
-            doc.add_picture(step.screenshot_path, width=Inches(4))
-    path = f"storage/docs/user_manual_{run.id}.docx"
+            # Annotate with red box for visual focus
+            add_red_box_to_image(step.screenshot_path)
+            
+            # Center picture
+            pic = doc.add_picture(step.screenshot_path, width=Inches(5))
+            last_p = doc.paragraphs[-1]
+            last_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            
+            # Figure caption
+            caption = doc.add_paragraph(f"Figure {i+1}.1 - {step.description} Interface")
+            caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            doc.add_paragraph("\n")
+
+    output_dir = "storage/docs"
+    os.makedirs(output_dir, exist_ok=True)
+    path = f"{output_dir}/user_manual_{run.id}.docx"
     doc.save(path)
     return path
 
 async def generate_tech_manual(run, steps):
+    """Logic-heavy branded technical specification"""
     doc = Document()
-    doc.add_heading("TECHNICAL MANUAL (MyProBuddy Branded)", level=1)
+    analyzer = RepoAnalyzer(".")
+    repo_data = analyzer.analyze()
+
+    # Header
+    section = doc.sections[0]
+    header = section.header
+    p = header.paragraphs[0]
+    p.text = "MyProBuddy Manual AI - Technical Specification"
+    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+    title = doc.add_heading("TECHNICAL SPECIFICATION", level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.add_paragraph(f"System: {run.url}").alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    doc.add_heading("1. SYSTEM ARCHITECTURE", level=1)
+    doc.add_paragraph("The following architecture was autonomously mapped by analyzing the runtime behavior and the associated source code repository.")
+
+    doc.add_heading("2. REPOSITORY MAPPING", level=2)
+    layout_p = doc.add_paragraph()
+    layout_p.add_run(repo_data["layout"]).font.name = 'Courier New'
+
+    doc.add_heading("3. LOGIC & CODE TRACING", level=1)
     for step in steps:
-        doc.add_paragraph(f"Logic: {step.ai_reasoning}")
+        doc.add_heading(f"Module: {step.description}", level=2)
+        doc.add_paragraph(f"Action Type: {step.action}")
+        doc.add_paragraph(f"Logic: {step.ai_reasoning}").italic = True
+        
         if step.mapped_code:
-            doc.add_paragraph(step.mapped_code)
-    path = f"storage/docs/tech_manual_{run.id}.docx"
+            doc.add_paragraph("Mapped Source Code:").bold = True
+            code_p = doc.add_paragraph()
+            code_run = code_p.add_run(step.mapped_code)
+            code_run.font.name = 'Courier New'
+            code_run.font.size = Pt(8)
+
+    doc.add_heading("4. API ARCHITECTURE", level=1)
+    api_table = doc.add_table(rows=1, cols=3)
+    api_table.style = 'Table Grid'
+    hdr_cells = api_table.rows[0].cells
+    hdr_cells[0].text = "Method"
+    hdr_cells[1].text = "Path"
+    hdr_cells[2].text = "Source File"
+    
+    for route in repo_data["api"]:
+        row = api_table.add_row().cells
+        row[0].text = route["method"]
+        row[1].text = route["path"]
+        row[2].text = route["file"]
+
+    output_dir = "storage/docs"
+    os.makedirs(output_dir, exist_ok=True)
+    path = f"{output_dir}/tech_manual_{run.id}.docx"
     doc.save(path)
     return path

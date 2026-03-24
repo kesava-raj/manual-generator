@@ -24,7 +24,7 @@ async def explore_website_v2(run_id: str, url: str, username: str, password: str
     try:
         from playwright.async_api import async_playwright
     except ImportError:
-        emit_event_fn(run_id, "failed", {"error": "Playwright not found"})
+        emit_event_fn(run_id, "failed", {"error": "Runtime Constraint: Playwright is not installed in this environment (Vercel Serverless). Please use the Railway Worker for crawls."})
         return
 
     genai.configure(api_key=GEMINI_API_KEY)

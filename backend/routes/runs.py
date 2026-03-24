@@ -51,6 +51,7 @@ async def create_run(
         username_cred=username,
         status="running",
         github_repo=github_repo,
+        logo_path=logo_path,
     )
     db.add(run)
     db.commit()
