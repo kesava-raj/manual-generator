@@ -4,7 +4,8 @@ import sys
 # Add the backend directory to sys.path so we can import from it
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "backend"))
 
+# Import the FastAPI app from backend/main.py
 from main import app
 
-# For Vercel, the variable must be named 'app'
-# Since it's already named 'app' in main.py, we just import it.
+# Vercel needs a variable named 'app'
+app = app
