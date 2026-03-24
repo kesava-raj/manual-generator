@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Dashboard() {
+const Dashboard = () => {
   const [runs, setRuns] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchRuns();
-    const interval = setInterval(fetchRuns, 5000);
+    const interval = setInterval(fetchRuns, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -24,150 +24,100 @@ function Dashboard() {
     }
   }
 
-  function getStatusBadge(status) {
-    const styles = {
-      running: 'status-running',
-      completed: 'status-completed',
-      failed: 'status-failed',
-      pending: 'status-pending',
-    };
-    return styles[status] || styles.pending;
-  }
-
-  function getStatusIcon(status) {
+  const getStatusColor = (status) => {
     switch (status) {
-      case 'running':
-        return (
-          <svg className="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        );
-      case 'completed':
-        return (
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        );
-      case 'failed':
-        return (
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        );
-      default:
-        return (
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+      case 'running': return 'text-[#EF3E25] bg-[#EF3E25]/10 border-[#EF3E25]/20';
+      case 'completed': return 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
+      case 'failed': return 'text-red-500 bg-red-500/10 border-red-500/20';
+      default: return 'text-white/40 bg-white/5 border-white/10';
     }
-  }
+  };
 
-  function formatDate(dateStr) {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr + 'Z');
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
-
-  function truncateUrl(url) {
+  const truncateUrl = (url) => {
     try {
       const u = new URL(url);
-      return u.hostname + (u.pathname !== '/' ? u.pathname.substring(0, 30) : '');
+      return u.hostname;
     } catch {
-      return url.substring(0, 40);
+      return url.length > 30 ? url.substring(0, 30) + '...' : url;
     }
-  }
+  };
 
   return (
-    <div className="animate-fade-in">
-      <div className="max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Project Dashboard</h1>
-          <p className="text-sm text-white/40 mt-1 accent-text uppercase tracking-widest">MyProBuddy Manual AI Fleet</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <button onClick={fetchRuns} className="p-2 text-white/40 hover:text-white transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
-          <button onClick={() => navigate('/new-run')} className="btn-brand">
-            New Run
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen py-16 px-6 bg-[#020205] relative overflow-hidden font-inter">
+      {/* Background Decor */}
+      <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#5D248F]/5 rounded-full blur-[150px] pointer-events-none"></div>
 
-      {/* Runs List */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
-        </div>
-      ) : runs.length === 0 ? (
-        <div className="glass-card p-12 text-center">
-          <div className="text-4xl mb-4">📋</div>
-          <h3 className="text-lg font-semibold text-white/70 mb-2">No runs yet</h3>
-          <p className="text-sm text-white/30 mb-6">Start your first exploration to generate a manual</p>
-          <button
-            onClick={() => navigate('/new-run')}
-            className="btn-brand text-sm"
-          >
-            Create First Run
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {runs.map((run, idx) => (
-            <div
-              key={run.id}
-              onClick={() => {
-                if (run.status === 'completed') {
-                  navigate(`/run/${run.id}/results`);
-                } else {
-                  navigate(`/run/${run.id}`);
-                }
-              }}
-              className="glass-card p-5 flex items-center justify-between cursor-pointer group hover:border-red-500/20 transition-all duration-300 hover:-translate-y-0.5 animate-slide-up"
-              style={{ animationDelay: `${idx * 0.05}s` }}
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-lg">
-                  🌐
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-white group-hover:text-red-500 transition-colors">
-                    {truncateUrl(run.url)}
-                  </p>
-                  <p className="text-xs text-white/30 mt-1">
-                    {formatDate(run.created_at)}
-                    {run.total_steps > 0 && (
-                      <span className="ml-3">• {run.total_steps} steps</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(run.status)}`}>
-                  {getStatusIcon(run.status)}
-                  {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
-                </span>
-                <svg className="w-4 h-4 text-white/20 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+      <div className="max-w-7xl mx-auto relative z-10">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-8 h-2 bg-[#EF3E25] rounded-full"></span>
+              <h4 className="text-[10px] font-black text-[#EF3E25] uppercase tracking-[0.4em]">Operations Center</h4>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+            <h1 className="text-5xl font-black text-white tracking-tighter">MyProBuddy <span className="text-white/20">Fleet</span></h1>
+          </div>
+          
+          <button 
+            onClick={() => navigate('/new-run')}
+            className="btn-brand px-10 py-5 text-xs font-black uppercase tracking-widest flex items-center gap-3 active:scale-[0.98] shadow-[0_0_20px_rgba(239,62,37,0.2)]"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+            </svg>
+            Initialize Analysis
+          </button>
+        </header>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="glass-card p-8 h-48 shimmer opacity-20"></div>
+            ))}
+          </div>
+        ) : runs.length === 0 ? (
+          <div className="glass-card p-20 text-center border-dashed border-white/10 bg-white/[0.01]">
+            <div className="text-white/10 text-6xl mb-6 font-black tracking-tighter">EMPTY_FLIGHT_DECK</div>
+            <p className="text-white/40 font-medium mb-8">No documentation agents have been deployed yet.</p>
+            <button onClick={() => navigate('/new-run')} className="btn-outline px-8 py-3 text-[10px] uppercase font-black tracking-widest">Deploy First Agent</button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {runs.map((run, idx) => (
+              <div
+                key={run.id}
+                onClick={() => navigate(run.status === 'completed' ? `/run/${run.id}/results` : `/run/${run.id}`)}
+                className="glass-card p-8 group cursor-pointer hover:border-[#EF3E25]/30 hover:bg-white/[0.03] transition-all duration-500 animate-slide-up bg-gradient-to-br from-white/[0.02] to-transparent relative overflow-hidden"
+                style={{ animationDelay: `${idx * 0.05}s` }}
+              >
+                {/* Decorative Accent */}
+                <div className={`absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 pointer-events-none transition-all duration-700 group-hover:opacity-20 ${run.status === 'completed' ? 'bg-emerald-500' : 'bg-[#EF3E25]'}`}></div>
+
+                <div className="flex items-start justify-between mb-8 relative z-10">
+                  <div className={`px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${getStatusColor(run.status)}`}>
+                    {run.status}
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:border-[#EF3E25]/20 group-hover:bg-[#EF3E25]/5 transition-all">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="space-y-1 mt-auto relative z-10">
+                  <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-[#EF3E25] transition-colors truncate">
+                    {truncateUrl(run.url)}
+                  </h3>
+                  <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                    ID: {run.id.slice(0, 8)} • {new Date(run.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default Dashboard;
