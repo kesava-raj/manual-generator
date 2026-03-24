@@ -44,10 +44,10 @@ else:
     app.mount("/storage/screenshots", StaticFiles(directory="/tmp/screenshots"), name="screenshots")
     app.mount("/storage/docs", StaticFiles(directory="/tmp/docs"), name="docs")
 
-# Include routers
-app.include_router(auth.router)
-app.include_router(runs.router)
-app.include_router(github.router)
+# Include routers with /api prefix
+app.include_router(auth.router, prefix="/api")
+app.include_router(runs.router, prefix="/api")
+app.include_router(github.router, prefix="/api")
 
 @app.get("/api/health")
 def health_check():

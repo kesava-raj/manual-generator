@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   * {
@@ -12,11 +12,15 @@
   }
 
   body {
-    font-family: 'Manrope', sans-serif;
-    background-color: #030408; /* Near Black */
+    font-family: 'Inter', sans-serif;
+    background-color: #020205; /* Blacker background */
     color: #f3f4f6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
   }
 
   ::-webkit-scrollbar {
@@ -33,7 +37,7 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #ef3e25; /* MyProBuddy Primary */
+    background: #ef3e25; /* MyProBuddy Primary Red */
   }
 }
 
@@ -48,42 +52,58 @@
   }
 
   .brand-gradient {
-    background: linear-gradient(135deg, #ef3e25 0%, #ff8c00 100%);
+    background: linear-gradient(135deg, #ef3e25 0%, #5d248f 50%, #fc5109 100%);
   }
 
   .brand-text {
-    background: linear-gradient(135deg, #ef3e25 0%, #ff8c00 100%);
+    background: linear-gradient(135deg, #ef3e25 0%, #fc5109 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .btn-brand {
-    @apply px-6 py-3 font-bold rounded-lg transition-all duration-300 ease-out uppercase tracking-wider text-sm;
-    background: linear-gradient(135deg, #ef3e25 0%, #ff8c00 100%);
+    @apply px-6 py-3 font-bold rounded-lg transition-all duration-300 ease-out uppercase tracking-wider text-sm shadow-lg;
+    background: linear-gradient(135deg, #ef3e25 0%, #e04108 100%);
     color: #ffffff;
+    font-family: 'Poppins', sans-serif;
   }
 
   .btn-brand:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(239, 62, 37, 0.4);
+    box-shadow: 0 10px 30px rgba(239, 62, 37, 0.5);
+    background: linear-gradient(135deg, #fc5109 0%, #ef3e25 100%);
   }
 
-  .btn-brand:active {
+  .btn-purple {
+    @apply px-6 py-3 font-bold rounded-lg transition-all duration-300 ease-out uppercase tracking-wider text-sm shadow-lg;
+    background: #5d248f;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .btn-purple:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(93, 36, 143, 0.4);
+    background: #4b1d74;
+  }
+
+  .btn-brand:active, .btn-purple:active {
     transform: translateY(0);
   }
 
   .btn-outline {
-    @apply px-6 py-3 font-semibold rounded-lg border border-red-500/40 text-red-400 transition-all duration-300;
+    @apply px-6 py-3 font-semibold rounded-lg border border-red-500/40 text-red-500 transition-all duration-300;
   }
 
   .btn-outline:hover {
-    @apply bg-red-500/10 border-red-500;
+    @apply bg-red-500/10 border-red-500 text-red-500;
   }
 
   .input-field {
     @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 
     focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-all duration-300;
+    font-family: 'Inter', sans-serif;
   }
 
   .status-running {
@@ -95,7 +115,7 @@
   }
 
   .status-failed {
-    @apply bg-red-500/20 text-red-400 border border-red-500/30;
+    @apply bg-red-500/20 text-red-500 border border-red-500/30;
   }
 
   .status-pending {
@@ -111,6 +131,14 @@
 
   .animate-brand-pulse {
     animation: brand-pulse 2s infinite;
+  }
+
+  .brand-glow {
+    text-shadow: 0 0 20px rgba(239, 62, 37, 0.4);
+  }
+
+  .accent-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
   @keyframes slide-in-right {

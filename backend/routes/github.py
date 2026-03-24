@@ -4,7 +4,7 @@ GitHub API routes — list repos, fetch file trees, read source code
 from fastapi import APIRouter, HTTPException, Query
 import httpx
 
-router = APIRouter(prefix="/api/github", tags=["github"])
+router = APIRouter(prefix="/github", tags=["github"])
 
 
 @router.get("/repos")

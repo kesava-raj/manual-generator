@@ -52,10 +52,10 @@ const Sidebar = () => {
     <div className="w-64 bg-[#030712] border-r border-white/5 flex flex-col h-screen fixed">
       <div className="p-6">
         <div className="flex items-center space-x-3 mb-10">
-          <div className="w-8 h-8 rounded bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center font-black text-white shadow-[0_0_15px_rgba(239,62,37,0.3)] text-xs">M</div>
+          <div className="w-8 h-8 rounded bg-gradient-to-br from-[#ef3e25] to-[#5d248f] flex items-center justify-center font-black text-white shadow-[0_0_15px_rgba(239,62,37,0.3)] text-xs">M</div>
           <div>
-            <h1 className="text-white font-black leading-none tracking-tight">MyProBuddy</h1>
-            <span className="text-[10px] text-red-500 font-bold tracking-widest uppercase">Manual AI</span>
+            <h1 className="text-white font-black leading-none tracking-tight font-heading">MyProBuddy</h1>
+            <span className="text-[10px] text-[#ef3e25] font-bold tracking-widest uppercase accent-text">Manual AI</span>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ const Sidebar = () => {
               className={({ isActive }) => `
                 flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
                 ${isActive 
-                  ? 'bg-red-500/10 text-red-500 shadow-[inset_0_0_15px_rgba(239,62,37,0.05)]' 
+                  ? 'bg-purple-500/10 text-purple-400 shadow-[inset_0_0_15px_rgba(93,36,143,0.05)]' 
                   : 'text-white/60 hover:text-white hover:bg-white/5'}
               `}
             >
@@ -87,7 +87,7 @@ const Sidebar = () => {
         ) : user ? (
           <div className="space-y-4">
             <div className="flex items-center space-x-3 group cursor-pointer">
-              <img src={user.avatar_url} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 group-hover:border-red-500 transition-colors" />
+              <img src={user.avatar_url} alt="Profile" className="w-8 h-8 rounded-full border border-white/10 group-hover:border-purple-500 transition-colors" />
               <div className="overflow-hidden">
                 <p className="text-sm font-medium text-white truncate">{user.username}</p>
                 <p className="text-[10px] text-white/40 truncate">GitHub Connected</p>

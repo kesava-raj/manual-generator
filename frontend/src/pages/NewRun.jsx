@@ -65,11 +65,14 @@ const NewRun = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-6">
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-white mb-2">New Exploration</h1>
-        <p className="text-white/60">Enter a website URL to automatically generate a manual</p>
-      </div>
+    <div className="min-h-screen py-12 px-4 bg-[#020205]">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-black text-white tracking-tight">New Exploration</h1>
+            <p className="text-sm text-white/40 mt-1 accent-text uppercase tracking-widest">Powered by MyProBuddy AI</p>
+          </div>
+        </div>
 
       <form onSubmit={handleSubmit} className="glass-card p-8 space-y-8 relative overflow-hidden">
         {/* Decorative corner */}
@@ -160,17 +163,19 @@ const NewRun = () => {
         <button
           type="submit"
           disabled={loading}
-          className="btn-brand w-full flex items-center justify-center space-x-2 py-4"
+          className="w-full btn-brand py-4 text-base flex items-center justify-center gap-3 active:scale-[0.98]"
         >
           {loading ? (
-            <div className="w-5 h-5 border-2 border-navy/30 border-t-navy rounded-full animate-spin"></div>
+            <>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Launching Agent...
+            </>
           ) : (
             <>
+              Launch AI Explorer
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>Start AI Exploration</span>
             </>
           )}
         </button>
@@ -183,6 +188,7 @@ const NewRun = () => {
           </p>
         </div>
       </form>
+      </div>
     </div>
   );
 };

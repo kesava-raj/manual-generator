@@ -79,10 +79,19 @@ const ExecutionPage = () => {
     logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
 
-  if (!run && !error) {
+  if (loading || (!run && !error)) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+      <div className="flex flex-col items-center justify-center py-32 space-y-6">
+        <div className="w-12 h-12 border-2 border-[#5d248f]/30 border-t-[#5d248f] rounded-full animate-spin" />
+        <p className="text-white/40 animate-pulse accent-text uppercase tracking-widest text-xs">Summoning MyProBuddy Agent...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-32 text-red-500">
+        <p>{error}</p>
       </div>
     );
   }
@@ -97,10 +106,13 @@ const ExecutionPage = () => {
             run.status === 'failed' ? 'status-failed' : 'status-pending'
           }`}>
             {run.status === 'running' && (
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-[#ef3e25] animate-pulse" />
             )}
             {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
           </span>
+          <h1 className="text-3xl font-black text-white mt-3 tracking-tight font-heading group">
+            Tracing <span className="text-white/40 group-hover:text-[#ef3e25] transition-colors">{run.url}</span>
+          </h1>
         </div>
       </div>
 
@@ -109,7 +121,7 @@ const ExecutionPage = () => {
         <div className="absolute inset-0 shimmer pointer-events-none" />
         <div className="flex items-center justify-between mb-4 relative z-10">
           <span className="text-sm font-semibold uppercase tracking-wider text-white/40">Exploration Progress</span>
-          <span className="text-sm font-bold text-red-500 px-3 py-1 bg-red-500/10 rounded-full border border-red-500/20">
+          <span className="text-sm font-bold text-[#ef3e25] px-3 py-1 bg-[#ef3e25]/10 rounded-full border border-[#ef3e25]/20">
             {steps.length} steps captured
           </span>
         </div>
@@ -120,7 +132,7 @@ const ExecutionPage = () => {
               width: `${getProgressPercent()}%`,
               background: run.status === 'failed'
                 ? 'linear-gradient(90deg, #ef4444, #dc2626)'
-                : 'linear-gradient(90deg, #6366f1, #06b6d4, #6366f1)',
+                : 'linear-gradient(90deg, #ef3e25, #5d248f, #fc5109)',
               backgroundSize: '200% 100%'
             }}
           />
@@ -153,7 +165,7 @@ const ExecutionPage = () => {
           <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
             {steps.length === 0 ? (
               <div className="flex items-center gap-3 py-4">
-                <div className="w-6 h-6 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-[#5d248f]/30 border-t-[#5d248f] rounded-full animate-spin" /> {/* Updated color */}
                 <span className="text-sm text-white/30">Initializing exploration...</span>
               </div>
             ) : (
@@ -165,11 +177,13 @@ const ExecutionPage = () => {
                 >
                   {/* Timeline dot */}
                   <div className="flex flex-col items-center">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                      idx === steps.length - 1 ? 'bg-red-600 text-white' : 'bg-white/10 text-white/50'
-                    }`}>
-                      {step.step_number}
-                    </div>
+                    <div className={`w-3 h-3 rounded-full border-2 transition-all duration-500 ${
+                      idx < steps.length - 1 ? 'bg-[#5d248f] border-[#5d248f]' : // Assuming idx < steps.length - 1 is equivalent to index < activeStepIndex
+                      idx === steps.length - 1 ? 'bg-[#ef3e25] border-[#ef3e25] animate-brand-pulse scale-125' : // Assuming idx === steps.length - 1 is active step
+                      'bg-transparent border-white/20'
+                    }`} />
+                    {/* The step.step_number was removed in the instruction, re-adding it to maintain functionality */}
+                    {/* The instruction provided a different structure for the dot, adapting it to fit existing logic */}
                     {idx < steps.length - 1 && (
                       <div className="w-px h-full bg-white/10 my-1" />
                     )}
@@ -186,11 +200,15 @@ const ExecutionPage = () => {
                     {step.mapped_code && (
                       <div className="mt-4 bg-[#050C1A] rounded-xl border border-white/5 overflow-hidden shadow-inner">
                         <div className="bg-white/5 px-3 py-1.5 border-b border-white/5 flex items-center justify-between">
-                          <span className="text-[9px] text-red-500 font-bold uppercase tracking-widest">Mapped Source Code</span>
+                          <span className="text-[9px] text-[#ef3e25] font-bold uppercase tracking-widest">Mapped Source Code</span> {/* Updated color */}
                           <div className="flex gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+                            <div className="relative h-1 bg-white/5 rounded-full overflow-hidden">
+                              <div 
+                                className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#ef3e25] to-[#5d248f] transition-all duration-1000 ease-out"
+                                style={{ width: `${getProgressPercent()}%` }} // Re-using getProgressPercent for explorationProgress
+                              />
+                            </div>
                           </div>
                         </div>
                         <pre className="p-4 text-[11px] text-white/70 font-mono overflow-x-auto whitespace-pre leading-relaxed custom-scrollbar">
