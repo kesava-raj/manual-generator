@@ -131,8 +131,13 @@ async def github_callback(code: str, db: Session = Depends(get_db)):
 
 
 @router.get("/me")
-async def get_current_user(token: str, db: Session = Depends(get_db)):
-    """Get current user info from JWT token"""
+async def get_current_user(request: Request, db: Session = Depends(get_db)):
+    """Get current user info from JWT token in Authorization header"""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing authorization")
+    
+    token = auth_header.split(" ")[1]
     payload = verify_jwt(token)
     user = db.query(User).filter(User.id == payload["sub"]).first()
 

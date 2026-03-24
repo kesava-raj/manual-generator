@@ -16,7 +16,9 @@ const Sidebar = () => {
       }
 
       try {
-        const res = await axios.get(`/api/auth/me?token=${token}`);
+        const res = await axios.get('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         setUser(res.data);
       } catch (err) {
         console.error("Failed to fetch user", err);
